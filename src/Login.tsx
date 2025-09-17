@@ -1,18 +1,57 @@
-import React from "react";
-
+import React, { useState } from "react";
+import axios from "axios";
 const Login = () => {
+  const [username, setUsername] = useState("");
+  const [password, setPassword] = useState(""); 
+  const [error, setError] = useState("");
+  const [loading, setLoading] = useState(false);
+
+  const handleLogin = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setError("");
+
+    // Simple validation
+    if (!username || !password) {
+      setError("Username and password are required.");
+      return;
+    }
+
+    setLoading(true);
+    try {
+      // Replace with your actual API endpoint
+      const response:any = await axios.post("http://localhost:3000/api/auth/login", {
+       email: username, password 
+      },
+      {withCredentials: true},
+    );
+
+      if (!response.ok) {
+        setError("Invalid username or password.");
+      } else {
+        // Handle successful login (e.g., redirect, save token, etc.)
+        const data = await response.json();
+        console.log("Login success:", data);
+      }
+    } catch (err) {
+      setError("Network error. Please try again.");
+    }
+    setLoading(false);
+  };
+
   return (
     <div className="flex items-center justify-center min-h-screen bg-base-200">
       <div className="card w-96 bg-base-100 shadow-xl">
         <div className="card-body">
           <h2 className="card-title justify-center mb-4">Login</h2>
-          <form>
+          <form onSubmit={handleLogin}>
             <div className="form-control mb-4">
               <label className="label">
                 <span className="label-text">Username</span>
               </label>
               <input
                 type="text"
+                value={username}
+                onChange={(e) => setUsername(e.target.value)}
                 placeholder="Enter username"
                 className="input input-bordered"
               />
@@ -23,13 +62,22 @@ const Login = () => {
               </label>
               <input
                 type="password"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
                 placeholder="Enter password"
                 className="input input-bordered"
               />
             </div>
+            {error && (
+              <div className="text-error mb-4 text-center">{error}</div>
+            )}
             <div className="form-control">
-              <button className="btn btn-primary w-full" type="submit">
-                Login
+              <button
+                className="btn btn-primary w-full"
+                type="submit"
+                disabled={loading}
+              >
+                {loading ? "Logging in..." : "Login"}
               </button>
             </div>
           </form>
