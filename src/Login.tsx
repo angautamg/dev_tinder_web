@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import axios from "axios";
 import { useDispatch } from "react-redux";
 import { addUser } from "./utils/userSlice";
-
+import { API_BASE_URL } from "./utils/constant";
 
 const Login = () => {
   const [username, setUsername] = useState("aryan@gmail.com");
@@ -24,7 +24,7 @@ const dispatch = useDispatch();
     setLoading(true);
     try {
       // Replace with your actual API endpoint
-      const response:any = await axios.post("http://localhost:3000/api/auth/login", {
+      const response:any = await axios.post(`${API_BASE_URL}auth/login`, {
        email: username, password 
       },
       {withCredentials: true},
