@@ -1,10 +1,15 @@
 import React, { useState } from "react";
 import axios from "axios";
+import { useDispatch } from "react-redux";
+import { addUser } from "./utils/userSlice";
+
+
 const Login = () => {
-  const [username, setUsername] = useState("");
-  const [password, setPassword] = useState(""); 
+  const [username, setUsername] = useState("aryan@gmail.com");
+  const [password, setPassword] = useState("Aryan@123"); 
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
+const dispatch = useDispatch();
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -25,12 +30,11 @@ const Login = () => {
       {withCredentials: true},
     );
 
-      if (!response.ok) {
+      if (response.status!== 200) {
         setError("Invalid username or password.");
       } else {
         // Handle successful login (e.g., redirect, save token, etc.)
-        const data = await response.json();
-        console.log("Login success:", data);
+         dispatch(addUser(response.data.user));
       }
     } catch (err) {
       setError("Network error. Please try again.");
