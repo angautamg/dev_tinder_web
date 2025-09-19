@@ -1,15 +1,17 @@
 import React, { useState } from "react";
 import axios from "axios";
 import { useDispatch } from "react-redux";
-import { addUser } from "./utils/userSlice";
-import { API_BASE_URL } from "./utils/constant";
+import { addUser } from "../utils/userSlice";
+import { API_BASE_URL } from "../utils/constant";
+import { useNavigate } from "react-router-dom";
 
 const Login = () => {
   const [username, setUsername] = useState("aryan@gmail.com");
-  const [password, setPassword] = useState("Aryan@123"); 
+  const [password, setPassword] = useState("Aryan@123");
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
-const dispatch = useDispatch();
+  const dispatch = useDispatch();
+const navigate = useNavigate();
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -24,20 +26,21 @@ const dispatch = useDispatch();
     setLoading(true);
     try {
       // Replace with your actual API endpoint
-      const response:any = await axios.post(`${API_BASE_URL}auth/login`, {
-       email: username, password 
+      const response: any = await axios.post(`${API_BASE_URL}auth/login`, {
+        email: username, password
       },
-      {withCredentials: true},
-    );
+        { withCredentials: true },
+      );
 
-      if (response.status!== 200) {
-        setError("Invalid username or password.");
-      } else {
+      
         // Handle successful login (e.g., redirect, save token, etc.)
-         dispatch(addUser(response.data.user));
+        dispatch(addUser(response.data.user));
+      navigate("/");
+    
+    } catch (err:any) {
+      if (err.status !== 200) {
+        setError(err.response.data.error || "Login failed. Please try again.");
       }
-    } catch (err) {
-      setError("Network error. Please try again.");
     }
     setLoading(false);
   };
