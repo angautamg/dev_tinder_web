@@ -33,6 +33,11 @@ const Navbar = () => {
       </div>
       <div className="flex gap-2">
         <input type="text" placeholder="Search" className="input input-bordered w-18 md:w-auto" />
+       {!user && (
+          <Link to="/login" className="btn btn-outline btn-primary ml-2">
+            Login
+          </Link>
+        )}
         {user && (
           <span className="ml-4 text-lg font-semibold text-primary">Welcome, {user.firstName}</span>
         )}
