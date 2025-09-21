@@ -1,4 +1,6 @@
 import React, { useState } from "react";
+import axios from "axios";
+import { API_BASE_URL } from "../utils/constant";
 
 const defaultProfile = {
   firstName: "",
@@ -41,10 +43,13 @@ const EditProfile = ({ user = defaultProfile, onSave }: any) => {
     }));
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async(e: React.FormEvent) => {
     e.preventDefault();
     if (onSave) onSave(form);
-    console.log("Profile saved:", form);
+    const { firstName,lastName,age,gender,about,interests,location,profilePicture} = form; // Remove updatedAt if present
+    const payload={ firstName,lastName,age,gender,about,interests,location,profilePicture};
+    const response = await axios.patch(`${API_BASE_URL}user/editprofile`, payload, { withCredentials: true });
+    console.log('Server response:', response.data);
   };
 
   return (

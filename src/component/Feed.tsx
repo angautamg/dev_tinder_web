@@ -6,7 +6,7 @@ import { addFeed } from "../utils/feedSlice";
 import UserCard from "./UserCard";
 
 const Feed = () => {
-    const feed = useSelector((state: any) => state.feed);
+    const feed:[] = useSelector((state: any) => state.feed);
 
     const dispatch = useDispatch();
 
