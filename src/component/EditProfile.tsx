@@ -49,7 +49,7 @@ const EditProfile = ({ user = defaultProfile, onSave }: any) => {
     const { firstName,lastName,age,gender,about,interests,location,profilePicture} = form; // Remove updatedAt if present
     const payload={ firstName,lastName,age,gender,about,interests,location,profilePicture};
     const response = await axios.patch(`${API_BASE_URL}user/editprofile`, payload, { withCredentials: true });
-    console.log('Server response:', response.data);
+  
   };
 
   return (

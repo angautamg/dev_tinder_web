@@ -18,7 +18,7 @@ interface ConnectionCardProps {
 const ConnectionCard = ({ connection }: ConnectionCardProps) => {
   return (
     <div className="w-full">
-      <div className="flex items-center bg-base-100 rounded-xl shadow hover:bg-base-200 transition-colors px-4 py-3 mb-2">
+      <div className="flex items-center rounded-xl shadow  transition-colors px-4 py-3 mb-2">
         <div className="avatar mr-4">
           <div className="w-14 rounded-full ring ring-primary ring-offset-base-100 ring-offset-2">
             <img src={connection.profilePicture} alt={`${connection.firstName} ${connection.lastName}`} />

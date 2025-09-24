@@ -7,7 +7,7 @@ const Connection: React.FC = () => {
 
  
 	return (
-        <div className="min-h-screen bg-base-200 p-8">
+        <div className="min-h-screen p-8">
     <h3 className="text-2xl font-bold mb-6">Connection Page</h3>
     <div className="flex flex-block flex-wrap gap-8 justify-center">
         {/* {user && (<ConnectionCard connection={user} />)} */}

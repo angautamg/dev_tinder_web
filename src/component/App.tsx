@@ -9,6 +9,7 @@ import Connection from "./Connection"
 
 function App() {
   return (
+    <div className="min-h-screen gradient-bg">
     <Provider store={appStore}> 
     <BrowserRouter basename="/">
       <Routes>
@@ -21,7 +22,7 @@ function App() {
       </Routes>
     </BrowserRouter>
     </Provider>
-  )
+  </div>)
 }
 
 export default App

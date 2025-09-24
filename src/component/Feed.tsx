@@ -26,7 +26,7 @@ const Feed = () => {
         getFeed();
     }, []);
 
-    return (<div className="flex flex-wrap gap-6 justify-center items-center min-h-screen bg-base-200">
+    return (<div className="flex flex-wrap gap-6 justify-center items-center min-h-screen">
             {feed && feed.length > 0 ? (
                 feed.map((user: any, idx: number) => (
                     <UserCard key={idx} user={user} />
