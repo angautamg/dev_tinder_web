@@ -12,7 +12,7 @@ interface UserCardProps {
 
 const UserCard = ({ user }: UserCardProps) => {
   return (
-    <div className="card bg-base-300 w-96 shadow-sm">
+    <div className="card  w-96 shadow-sm">
       <figure>
         <img
           src={user.profilePicture}

@@ -6,7 +6,7 @@ import { addFeed } from "../utils/feedSlice";
 import UserCard from "./UserCard";
 
 const Feed = () => {
-    const feed:[] = useSelector((state: any) => state.feed);
+    const feed: [] = useSelector((state: any) => state.feed);
 
     const dispatch = useDispatch();
 
@@ -26,14 +26,22 @@ const Feed = () => {
         getFeed();
     }, []);
 
-    return (<div className="flex flex-wrap gap-6 justify-center items-center min-h-screen">
-            {feed && feed.length > 0 ? (
-                feed.map((user: any, idx: number) => (
-                    <UserCard key={idx} user={user} />
-                ))
-            ) : (
-                <span className="text-lg text-gray-500">No users found.</span>
-            )}
-        </div>);
+    return (
+        <div className="min-h-screen p-8">
+            <h3 className="text-2xl font-bold mb-6">Feed</h3>
+            <div className="flex flex-block flex-wrap gap-8 justify-center">
+                <div className="flex flex-wrap gap-6 justify-center items-center min-h-screen">
+
+                    {feed && feed.length > 0 ? (
+                        feed.map((user: any, idx: number) => (
+                            <UserCard key={idx} user={user} />
+                        ))
+                    ) : (
+                        <span className="text-lg text-gray-500">No users found.</span>
+                    )}
+                </div>
+            </div>
+        </div>
+    ); 
 }
 export default Feed;
