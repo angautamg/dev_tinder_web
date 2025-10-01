@@ -1,13 +1,26 @@
 @import "tailwindcss";
-@plugin "daisyui";
+@plugin "daisyui" {
+  themes: acid --default, abyss --prefersdark,acid,corporate,dark;
+  root: "#my-app";
+  include:;
+  exclude:;
+  prefix: ;
+  logs: false;
+}
 
 * {
             font-family: 'Inter', sans-serif;
-        }
+  }
 
-        .gradient-bg {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-        }
+/* With a white wash mixed in */
+.gradient-bg-overlay-whitewash {
+  background: linear-gradient(
+    135deg,
+    rgba(255,255,255,0.5),
+    rgba(102, 126, 234, 0.3) 40%,
+    rgba(118, 75, 162, 0.3) 100%
+  );
+}
 
         .floating-animation {
             animation: floating 3s ease-in-out infinite;

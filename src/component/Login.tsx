@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import axios from "axios";
 import { useDispatch, useSelector } from "react-redux";
 import { addUser } from "../utils/userSlice";
@@ -6,67 +6,146 @@ import { API_BASE_URL } from "../utils/constant";
 import { useNavigate } from "react-router-dom";
 import { showToast } from "../utils/toasterSlice";
 
+const initForm: any = {
+    username: '',
+    password: '',
+    rememberMe: false,
+    gender: "Female",
+    name: "",
+    age: 18
+};
 // Login Form Component
+
 const Login = () => {
+    const [errors, setErrors]: any = useState({});
     const dispatch = useDispatch();
     const navigate = useNavigate();
     const [showPassword, setShowPassword] = useState(false);
+    const [isSignIn, setIsSignIn] = useState(true);
+    const genderOptions = ["Male", "Female", "Other"];
     const toaster = useSelector((state: any) => state.toaster);
-    const [formData, setFormData] = useState({
-        username: '',
-        password: '',
-        rememberMe: false
-    });
-  
+    const [formData, setFormData] = useState(initForm);
+
     const handleInputChange = (e: any) => {
         const { name, value, type, checked } = e.target;
-        setFormData(prev => ({
+        setFormData((prev: any) => ({
             ...prev,
             [name]: type === 'checkbox' ? checked : value
         }));
     };
 
-    const handleSubmit = async (e: any) => {
-        e.preventDefault();
-        
-        // Simple validation
-        if (!formData.username || !formData.password) {
-            dispatch(showToast({ message_type: "error", message: "Username and password are required." }));
-            //setError("Username and password are required.");
-             return;
+    const handleInputChangeGender = (e: React.ChangeEvent<HTMLSelectElement>) => {
+        setFormData({ ...formData, [e.target.name]: e.target.value });
+    };
+
+    const validate = (values: any) => {
+        const errors: any = {};
+        if (!isSignIn) {
+            if (!values.name.trim()) {
+                errors.name = "Name is required";
+            }
+            if (values.name.trim().length < 4) {
+                errors.name = "Name must be at least 4 characters";
+            }
+
+            if (!values.age) {
+                errors.age = "Age is required";
+            } else if (!/^[0-9]+$/.test(values.age)) {
+                errors.age = "Age must contain only numbers";
+            } else if (parseInt(values.age, 10) < 18) {
+                errors.age = "Age must be 18 or above";
+            }
+
+            if (!["Male", "Female", "Other"].includes(values.gender)) {
+                errors.gender = "Invalid gender selected";
+            }
         }
 
+        if (!values.username.trim()) {
+            errors.username = "Username is required";
+        } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(values.username)) {
+            errors.username = "Enter a valid email address";
+        }
+
+        if (!values.password) {
+            errors.password = "Password is required";
+        } else if (values.password.length < 6) {
+            errors.password = "Password must be at least 6 characters";
+        }
+        return errors;
+    };
+
+    const handleSignIn = async () => {
         try {
             // Replace with your actual API endpoint
-            const response: any = await axios.post(`${API_BASE_URL}auth/login`, {
-                email: formData.username, password: formData.password
-            },
+            const firstName = formData.name.split(' ')[0];
+            const lastName = formData.name.split(' ')[1] || "";
+
+            const url = isSignIn ? `${API_BASE_URL}auth/login` : `${API_BASE_URL}auth/register`;
+            const payload = isSignIn ? ({ email: formData.username, password: formData.password }) : (
+                {
+                    email: formData.username, password: formData.password,
+                    firstName, lastName, age: formData.age, gender: formData.gender
+                });
+
+            const response: any = await axios.post(url, payload,
                 { withCredentials: true },
             );
             // Handle successful login (e.g., redirect, save token, etc.)
             dispatch(addUser(response.data.user));
-            dispatch(showToast({ message_type: "success", message: "Login successful!" }));
-            navigate("/");
+            dispatch(showToast({ message_type: "success", message: (isSignIn ? "Login successful!" : "Register successful") }));
+
+            if (isSignIn) {
+                navigate("/")
+            } else {
+                navigate("/login");
+                handleIsSignIn();
+            }
+
 
         } catch (err: any) {
             if (err.status !== 200) {
                 dispatch(showToast({ message_type: "error", message: err.response.data.error || "Login failed. Please try again." }));
             }
         }
+    }
+
+    const handleSubmit = async (e: any) => {
+        e.preventDefault();
+        // Simple validation
+        const errorData = validate(formData)
+        setErrors(errorData);
+        // returns true if valid
+
+        if (!isSignIn && !(Object.keys(errorData).length === 0)) {
+            dispatch(showToast({ message_type: "error", message: "All * marked fields are mandatory" }));
+            return;
+        }
+        if (isSignIn && !(Object.keys(errorData).length === 0)) {
+            dispatch(showToast({ message_type: "error", message: "Invalid username or password" }));
+            return;
+        }
+
+        handleSignIn();
+
         // Simulate login process
     };
-
+    const handleIsSignIn = () => {
+        setIsSignIn(prev => !prev);
+        setErrors({});
+        setFormData(initForm);
+    }
     const togglePasswordVisibility = () => {
         setShowPassword(!showPassword);
     };
 
-    
+
 
     return (
         <div className="hero min-h-screen mb-5">
             <div className="hero-content flex-col lg:flex-row-reverse">
                 <div className="card shrink-0 w-full max-w-md shadow-2xl glass-card slide-in pulse-glow">
-                    <div className="card-body">
+                    <div className="card-body" data-theme="nord">
                         {/* Welcome Text */}
                         <div className="text-center mb-6">
                             <h1 className="text-3xl font-bold text-white mb-2">Welcome Back</h1>
@@ -74,10 +153,69 @@ const Login = () => {
                         </div>
 
                         <form onSubmit={handleSubmit} className="space-y-4">
+                            {/***Additional field for Sign UP**/}
+                            {!isSignIn && (<>
+                                <div className="form-control">
+                                    <label className="label">
+                                        <span className="label-text text-white font-medium">Full name <span style={{ color: "red" }}>*</span></span>
+                                    </label>
+                                    <div className="relative">
+                                        <input
+                                            type="text"
+                                            name="name"
+                                            value={formData.name}
+                                            onChange={handleInputChange}
+                                            placeholder="Enter your name"
+                                            className="input input-bordered w-full bg-white/10 text-white placeholder-white/60 border-white/30 focus:border-white/60 pr-10"
+                                            required
+                                        />
+                                    </div>
+                                    {errors && errors.name && <p className="label-text" style={{ color: "red" }}>{errors.name}</p>}
+                                </div>
+                                <div className="form-control">
+                                    <label className="label">
+                                        <span className="label-text text-white font-medium">Age(18+Only) <span style={{ color: "red" }}>*</span></span>
+                                    </label>
+                                    <div className="relative">
+                                        <input
+                                            type="text"
+                                            name="age"
+                                            value={formData.age}
+                                            onChange={handleInputChange}
+                                            placeholder="Enter your Age(18+Only)"
+                                            className="input input-bordered w-full bg-white/10 text-white placeholder-white/60 border-white/30 focus:border-white/60 pr-10"
+                                            required
+                                        />
+                                    </div>
+                                    {errors && errors.age && <p className="label-text" style={{ color: "red" }}>{errors.age}</p>}
+                                </div>
+                                <div className="form-control">
+                                    <label className="label">
+                                        <span className="label-text text-white font-medium">Gender <span style={{ color: "red" }}>*</span></span>
+                                    </label>
+                                    <div className="relative">
+                                        <select
+                                            name="gender"
+                                            value={formData.gender}
+                                            onChange={handleInputChangeGender}
+                                            className="select select-bordered w-full  text-white border-white/30 focus:border-white/60 pr-10"
+                                            required
+                                        >
+                                            {genderOptions.map((option) => (
+                                                <option key={option} value={option} className="text-black bg-gray-800 text-white" >
+                                                    {option}
+                                                </option>
+                                            ))}
+                                        </select>
+                                    </div>
+                                    {errors && errors.gender && <p className="label-text" style={{ color: "red" }}>{errors.gender}</p>}
+                                </div>
+                            </>)}
+
                             {/* Username Field */}
                             <div className="form-control">
                                 <label className="label">
-                                    <span className="label-text text-white font-medium">Username</span>
+                                    <span className="label-text text-white font-medium">Email(Username) <span style={{ color: "red" }}>*</span></span>
                                 </label>
                                 <div className="relative">
                                     <input
@@ -85,7 +223,7 @@ const Login = () => {
                                         name="username"
                                         value={formData.username}
                                         onChange={handleInputChange}
-                                        placeholder="Enter your username"
+                                        placeholder="Enter your email"
                                         className="input input-bordered w-full bg-white/10 text-white placeholder-white/60 border-white/30 focus:border-white/60 pr-10"
                                         required
                                     />
@@ -93,12 +231,13 @@ const Login = () => {
                                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
                                     </svg>
                                 </div>
+                                {errors && errors.username && <p className="label-text" style={{ color: "red" }}>{errors.username}</p>}
                             </div>
 
                             {/* Password Field */}
                             <div className="form-control">
                                 <label className="label">
-                                    <span className="label-text text-white font-medium">Password</span>
+                                    <span className="label-text text-white font-medium">Password <span style={{ color: "red" }}>*</span></span>
                                 </label>
                                 <div className="relative">
                                     <input
@@ -126,10 +265,12 @@ const Login = () => {
                                             </svg>
                                         )}
                                     </button>
+                                    {errors && errors.password && <p className="label-text" style={{ color: "red" }}>{errors.password}</p>}
                                 </div>
                             </div>
 
                             {/* Remember Me & Forgot Password */}
+
                             <div className="flex items-center justify-between">
                                 <label className="label cursor-pointer">
                                     <input
@@ -139,9 +280,10 @@ const Login = () => {
                                         onChange={handleInputChange}
                                         className="checkbox checkbox-primary checkbox-sm"
                                     />
-                                    <span className="label-text text-white/80 ml-2">Remember me</span>
+                                    <span className="label-text text-white/80 ml-2">{isSignIn ? "Remember me" : "I am accept all Terms and Conditions"}</span>
                                 </label>
-                                <a href="#" className="link link-primary text-sm">Forgot password?</a>
+                                {isSignIn && (<a className="link link-primary text-sm">Forgot password?</a>
+                                )}
                             </div>
 
                             {/* Login Button */}
@@ -181,14 +323,14 @@ const Login = () => {
                         {/* Sign Up Link */}
                         <div className="text-center mt-6">
                             <p className="text-white/80">
-                                Don't have an account?
-                                <a href="#" className="link link-primary font-semibold ml-1">Sign up</a>
+                                {isSignIn ? "Don't have an account?" : "I have an account"}
+                                <a onClick={() => handleIsSignIn()} className="link link-primary font-semibold ml-1">{isSignIn ? "Sign up" : "Sign in"}</a>
                             </p>
                         </div>
                     </div>
                 </div>
             </div>
-           
+
         </div>
     );
 };

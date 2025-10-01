@@ -28,15 +28,15 @@ const Navbar = () => {
 
   return (
 
-                <div className="navbar glass-card border-b border-white/20 px-6">
-                    <div className="navbar-start">
+                <div className="navbar  border-b  px-6" data-theme="nord">
+                    <div className="navbar-start" >
                         <div className="flex items-center space-x-3">
                             <div className="w-10 h-10 bg-white rounded-lg flex items-center justify-center floating-animation">
                                 <svg className="w-6 h-6 text-purple-600" fill="currentColor" viewBox="0 0 20 20">
                                     <path d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
                                 </svg>
                             </div>
-                             <Link to="/" className="btn btn-ghost text-xl"><span className="text-white font-bold text-xl">ModernApp</span>
+                             <Link to="/" className="btn btn-ghost text-xl"><span className="text-white font-bold text-xl">Feedly </span>
                              </Link>
                             
                         </div>
@@ -69,13 +69,13 @@ const Navbar = () => {
 
                         {/* User Avatar */}
                         <div className="dropdown dropdown-end">
-                            <div tabIndex={0} role="button" className="btn btn-ghost btn-circle avatar">
+                            {user && ( <div tabIndex={0} role="button" className="btn btn-ghost btn-circle avatar">
                                 <div className="w-10 rounded-full ring ring-primary ring-offset-base-100 ring-offset-2">
                                     <div className="w-full h-full bg-gradient-to-br from-purple-400 to-pink-400 flex items-center justify-center">
-                                        {user && (<img alt="Profile picture"  src={user.profilePicture} />)}
+                                       <img alt="Profile picture"  src={user.profilePicture} />
                                     </div>
                                 </div>
-                            </div>
+                            </div>)}
                             <ul tabIndex={0} className="menu menu-sm dropdown-content mt-3 z-999 p-2 shadow bg-base-100 rounded-box w-52">
                                 {user && ( <li>  <Link to="/profile">Profile</Link></li>)}
                                 {user && ( <li>  <Link to="/connection">Connection</Link></li>)}

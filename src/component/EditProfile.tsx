@@ -1,6 +1,8 @@
 import React, { useState } from "react";
 import axios from "axios";
 import { API_BASE_URL } from "../utils/constant";
+import { useDispatch } from "react-redux";
+import { showToast } from "../utils/toasterSlice";
 
 const defaultProfile = {
   firstName: "",
@@ -18,6 +20,7 @@ const genderOptions = ["Male", "Female", "Other"];
 
 const EditProfile = ({ user = defaultProfile, onSave }: any) => {
   const [form, setForm] = useState({ ...user });
+  const dispatch = useDispatch();
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
     const { name, value } = e.target;
@@ -48,13 +51,21 @@ const EditProfile = ({ user = defaultProfile, onSave }: any) => {
     if (onSave) onSave(form);
     const { firstName,lastName,age,gender,about,interests,location,profilePicture} = form; // Remove updatedAt if present
     const payload={ firstName,lastName,age,gender,about,interests,location,profilePicture};
+    try {
+
     const response = await axios.patch(`${API_BASE_URL}user/editprofile`, payload, { withCredentials: true });
+    if (response.status === 200) {
+     dispatch(showToast({ message_type: "success", message: "Profile update successfuly!" }));
+    }
+  } catch (error:any) {
+    dispatch(showToast({ message_type: "error", message: error.response?.data?.message || "An error occurred." }));
+  }
   
   };
 
   return (
-    <form
-      className="max-w-xl mx-auto bg-base-100 p-8 rounded-2xl shadow-lg flex flex-col gap-6"
+    <form  data-theme="acid"
+      className="max-w-xl  mx-auto p-8 rounded-2xl shadow-lg flex flex-col gap-6"
       onSubmit={handleSubmit}
     >
       <h2 className="text-3xl font-bold text-center mb-2">Edit Profile</h2>

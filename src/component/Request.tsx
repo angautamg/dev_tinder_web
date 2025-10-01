@@ -14,7 +14,7 @@ const Request = () => {
         {},
         {withCredentials:true});
         if(res.status===200){
-        //dispatch(removeRequest());
+        dispatch(removeRequest(_id));
         }
        
 
